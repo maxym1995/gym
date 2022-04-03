@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>
+        Our club members :
+    </h2>
+    <ul>
+        {% for member in members %}
+        <l1> {{member.first_name}} {{member.last_name}} <a href="{% url 'member-details' member.id %}" Details> Details <a/> </l1> <br>
+        {% endfor %}
+    </ul>
+{% endblock %}

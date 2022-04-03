@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <h1>{% block main_header %}
+        GYM WK MASLO
+        {% endblock %}
+    </h1>
+    {% block content %}
+    {% endblock %}
+
+    {% block footer %}
+    GYM Maslo<br>
+
+    <img src="{% static 'image.png' %}" />
+
+    {% endblock %}
+
+</body>
+</html>
