@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect, Http404
-from .forms import AddMemberForm
+from .forms import AddMemberForm, AddStaffForm
 from datetime import datetime
 from django.views import View
-from .models import Members, SEX
+from .models import Members, SEX, Staff, Trainings, TRAININGS, TYPES
 
 
 class ShowMembersView(View):
@@ -29,3 +29,23 @@ class AddMemberView(View):
             sex = form.cleaned_data["sex"])
             return redirect(f'/member/{new_member.id}')
         return render(request, "member-add.html", {"form":form})
+
+class ShowTrainersView(View):
+    def get(self, request):
+        trainers = Staff.objects.filter(type=0)
+        return render(request, "trainers.html", {"trainers":trainers})
+
+class AddStaffView(View):
+    def get(self, request):
+        form = AddStaffForm()
+        return render(request, "staff-add.html", {"form":form})
+
+    def post(self, request):
+        form = AddStaffForm(request.POST)
+        if form.is_valid():
+            new_staff = Staff.objects.create(first_name = form.cleaned_data["first_name"],
+                                               last_name = form.cleaned_data["last_name"],
+            year_of_birth = form.cleaned_data["year_of_birth"],
+            type = form.cleaned_data["type"])
+            return redirect(f'/staff/{new_staff.id}')
+        return render(request, "staff-add.html", {"form":form})
