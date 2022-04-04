@@ -41,3 +41,10 @@ class Staff(models.Model):
 class Trainings(models.Model):
     name = models.CharField(max_length=64, choices = TRAININGS)
     trainer = models.OneToOneField(Staff, on_delete=models.CASCADE, primary_key=True)
+
+
+class Room(models.Model):
+    name = models.CharField(max_length=64)
+    capacity = models.SmallIntegerField()
+    training = models.ManyToManyField(Trainings)
+

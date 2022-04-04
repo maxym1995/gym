@@ -49,3 +49,21 @@ class AddStaffView(View):
             type = form.cleaned_data["type"])
             return redirect(f'/staff/{new_staff.id}')
         return render(request, "staff-add.html", {"form":form})
+
+class ShowTrainings(View):
+    def get(self, request):
+        trainings = Trainings.objects.all()
+        trainings_names = []
+        for t in trainings:
+            trainings_names.append(t.name)
+        intigers = []
+        for i in trainings_names:
+            intigers.append(int(i))
+        names = []
+        for j in intigers:
+            names.append(TRAININGS[j])
+        names_list = []
+        for n in names:
+            names_list.append(n[1])
+        return render(request, "trainings.html", {"names_list": names_list})
+

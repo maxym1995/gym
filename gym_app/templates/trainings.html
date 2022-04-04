@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>
+        Trainings list in our club:
+    </h2>
+    <ul>
+<!--        {% for training in trainings %}-->
+<!--        <l1> Trainer: {{training.trainer.first_name}} {{training.trainer.last_name}}-->
+<!--        {% endfor %}-->
+        {% for n in names_list %}
+        <li> {{ n }}   </l1> <br>
+
+        {% endfor %}
+    </ul>
+{% endblock %}
