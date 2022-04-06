@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import date
+from django.contrib.auth.models import User
 
 # Create your models here.
 # from gym_app.models import *
@@ -84,7 +85,7 @@ class Rooms(models.Model):
 
 
 class Reservations(models.Model):
-    member = models.ForeignKey(Members, on_delete = models.CASCADE)
+    member = models.ForeignKey(User, on_delete = models.CASCADE)
     training = models.ForeignKey(Trainings, on_delete=models.CASCADE)
     msg_to_trainer = models.CharField(max_length=256, null = True)
 

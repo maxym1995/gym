@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import TemplateView
+from django.contrib.auth.models import User
 
 
 class GymView(View):
@@ -17,28 +18,28 @@ class GymView(View):
 
 class ShowMembersView(View):
     def get(self, request):
-        members = Members.objects.all()
+        members = User.objects.all()
         return render(request, "members.html", {"members":members})
 
 class ShowMembersDetailsView(View):
-    def get(self, request, member_id):
-        member = Members.objects.get(id = member_id)
-        return render(request, "member-details.html", {"member":member, "sex":SEX[int(member.sex)][1]})
+    def get(self, request, user_id):
+        user = User.objects.get(id = user_id)
+        return render(request, "user-details.html", {"user":user})
 
-class AddMemberView(View):
-    def get(self, request):
-        form = AddMemberForm()
-        return render(request, "member-add.html", {"form":form})
-
-    def post(self, request):
-        form = AddMemberForm(request.POST)
-        if form.is_valid():
-            new_member = Members.objects.create(first_name = form.cleaned_data["first_name"],
-                                               last_name = form.cleaned_data["last_name"],
-            year_of_birth = form.cleaned_data["year_of_birth"],
-            sex = form.cleaned_data["sex"])
-            return redirect(f'/member/{new_member.id}')
-        return render(request, "member-add.html", {"form":form})
+# class AddMemberView(View):
+#     def get(self, request):
+#         form = AddMemberForm()
+#         return render(request, "member-add.html", {"form":form})
+#
+#     def post(self, request):
+#         form = AddMemberForm(request.POST)
+#         if form.is_valid():
+#             new_member = Members.objects.create(first_name = form.cleaned_data["first_name"],
+#                                                last_name = form.cleaned_data["last_name"],
+#             year_of_birth = form.cleaned_data["year_of_birth"],
+#             sex = form.cleaned_data["sex"])
+#             return redirect(f'/member/{new_member.id}')
+#         return render(request, "member-add.html", {"form":form})
 
 class ShowTrainersView(View):
     def get(self, request):
