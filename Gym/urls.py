@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from gym_app.views import   (ShowMembersView, ShowMembersDetailsView, ShowTrainersView, AddStaffView,
-                            ShowTrainings, Login, Logout, AddUser, GymView)
+                            ShowTrainings, Login, Logout, AddUser, GymView, Reservation)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -30,4 +30,6 @@ urlpatterns = [
     path('login/', Login.as_view(), name="login"),
     path('logout/', Logout.as_view(), name="logout"),
     path('add_user/', AddUser.as_view(), name="add-user"),
+    path('reservation/', Reservation.as_view(), name="reserve"),
+
 ]

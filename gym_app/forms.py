@@ -3,6 +3,7 @@ from .models import SEX, Members, TYPES
 from django.db import models
 from django.core.validators import EmailValidator, URLValidator, ValidationError
 from django.contrib.auth.models import User
+import string
 
 
 class AddMemberForm(forms.Form):
@@ -39,9 +40,31 @@ class AddUserForm(UserForm):
         return self.data['username']
 
     def clean(self):
+        numbers = False
+        special_char = False
+
+        for char in self.data['password_1']:
+            if char in string.digits:
+                numbers = True
+
+        for char in self.data['password_1']:
+            if char in string.punctuation:
+                special_char = True
+
         if self.data['password_1'] != self.data['password_2']:
-            self.add_error(None, error='Password is not matching')
+            self.add_error(None, error='Password is not matching!')
+        elif len(self.data['password_1']) < 8:
+            self.add_error(None, error='Password must contains at least 8 characters!')
+        elif (self.data['password_1']).islower():
+            self.add_error(None, error='At least 1 uppercase required!')
+        elif (self.data['password_1']).isupper():
+            self.add_error(None, error='At least 1 lowercase required!')
+        elif numbers != True:
+            self.add_error(None, error='At least 1 number required!')
+        elif special_char != True:
+            self.add_error(None, error='At least 1 special character required!')
         return super().clean()
+
 
     def save(self):
         user_data = self.cleaned_data
@@ -56,3 +79,4 @@ class AddUserForm(UserForm):
 
     class Meta(UserForm.Meta):
         fields = UserForm.Meta.fields + ('password_1', 'password_2')
+

@@ -95,6 +95,7 @@ class Login(FormView):
         return redirect(reverse('main'))
 
 
+
 class Logout(View):
     def get(self, request):
         return render(request, "logout.html")
@@ -108,3 +109,8 @@ class AddUser(CreateView):
     form_class = AddUserForm
     template_name = "user_add.html"
     success_url = reverse_lazy('main')
+
+
+class Reservation(View):
+    def get(self, request):
+        return render(request, "logout.html")
