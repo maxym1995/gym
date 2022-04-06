@@ -1,8 +1,18 @@
 from django.shortcuts import render, get_object_or_404, redirect, Http404
-from .forms import AddMemberForm, AddStaffForm
+from .forms import AddMemberForm, AddStaffForm, LoginForm, AddUserForm
 from datetime import datetime
 from django.views import View
 from .models import Members, SEX, Staff, Trainings, TRAININGS, TYPES
+from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
+from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponse, HttpResponseRedirect
+from django.urls import reverse_lazy, reverse
+from django.views.generic import TemplateView
+
+
+class GymView(View):
+    def get(self, request):
+        return render(request, "main_page.html")
 
 
 class ShowMembersView(View):
@@ -65,5 +75,35 @@ class ShowTrainings(View):
         names_list = []
         for n in names:
             names_list.append(n[1])
-        return render(request, "trainings.html", {"names_list": names_list})
 
+        zipped_list = zip(trainings, names_list)
+        return render(request, "trainings.html", {"zipped":zipped_list})
+
+
+class Login(FormView):
+    form_class = LoginForm
+    template_name = "login_form.html"
+
+    def form_valid(self, form):
+        user = authenticate(username=form.cleaned_data["login"],
+                            password=form.cleaned_data['password'])
+        if user is not None:
+            login(self.request, user)
+        else:
+            return HttpResponse('''Login error <br> <a href=''> Back</a> ''')
+        return redirect(reverse('main'))
+
+
+class Logout(View):
+    def get(self, request):
+        return render(request, "logout.html")
+
+    def post(self, request):
+        logout(request)
+        return redirect(reverse('main'))
+
+
+class AddUser(CreateView):
+    form_class = AddUserForm
+    template_name = "user_add.html"
+    success_url = reverse_lazy('main')

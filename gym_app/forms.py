@@ -17,3 +17,42 @@ class AddStaffForm(forms.Form):
     last_name = forms.CharField(label="Surname", max_length= 64)
     year_of_birth = forms.IntegerField(label = "Year of birth", min_value=1900, max_value=2022)
     type = forms.ChoiceField(label = "Training type", choices = TYPES)
+
+
+class LoginForm(forms.Form):
+    login = forms.CharField(max_length=64)
+    password = forms.CharField(max_length=64, widget=forms.PasswordInput)
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ("username", "first_name", "last_name", "email")
+
+class AddUserForm(UserForm):
+    password_1 = forms.CharField(widget=forms.PasswordInput,
+                                 help_text="Type password twice")
+    password_2 = forms.CharField(widget=forms.PasswordInput)
+
+    def clean_username(self):
+        if User.objects.filter(username=self.data['username']).exists():
+            self.add_error('username', error='User already exsist')
+        return self.data['username']
+
+    def clean(self):
+        if self.data['password_1'] != self.data['password_2']:
+            self.add_error(None, error='Password is not matching')
+        return super().clean()
+
+    def save(self):
+        user_data = self.cleaned_data
+        user = User.objects.create_user(
+            username=user_data['username'],
+            password=user_data['password_1'],
+            first_name=user_data['first_name'],
+            last_name=user_data['last_name'],
+            email=user_data['email'],
+        )
+        return user
+
+    class Meta(UserForm.Meta):
+        fields = UserForm.Meta.fields + ('password_1', 'password_2')

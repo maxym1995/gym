@@ -8,18 +8,26 @@
 <body>
 
     <h1>{% block main_header %}
-        GYM WK MASLO
+        GYM WK MASLO <br>
+        <h4>
+        <a href="{% url 'main' %}"> MainPage </a> <br>
+        </h4>
         {% endblock %}
     </h1>
     {% block content %}
     {% endblock %}
 
     {% block footer %}
+    <br><br>
     GYM Maslo<br>
 
-    <img src="{% static 'image.png' %}" />
+    <img src="{% static 'image.png' %}" /> <br>
 
-    {% endblock %}
-
+              {% if user.is_authenticated %}
+              Logged: {{ user }} <a href="{% url 'logout' %}">Logout</a>
+              {% else %}
+              <a href="{% url 'login' %}">LogIn</a>
+              {% endif %}
+            {% endblock %}
 </body>
 </html>

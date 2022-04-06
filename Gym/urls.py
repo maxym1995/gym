@@ -16,14 +16,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from gym_app.views import   (ShowMembersView, ShowMembersDetailsView, AddMemberView, ShowTrainersView, AddStaffView,
-                            ShowTrainings)
+                            ShowTrainings, Login, Logout, AddUser, GymView)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", GymView.as_view(), name = "main"),
     path("members/", ShowMembersView.as_view(), name = "members"),
     path("member_details/<int:member_id>/", ShowMembersDetailsView.as_view(), name = "member-details"),
     path("member_add/", AddMemberView.as_view(), name = "member-add"),
     path("trainers/", ShowTrainersView.as_view(), name = "trainers"),
     path("staff_add/", AddStaffView.as_view(), name = "staff-add"),
     path("trainings/", ShowTrainings.as_view(), name="trainings"),
+    path('login/', Login.as_view(), name="login"),
+    path('logout/', Logout.as_view(), name="logout"),
+    path('add_user/', AddUser.as_view(), name="add-user"),
 ]
