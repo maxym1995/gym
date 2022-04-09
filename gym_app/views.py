@@ -1,22 +1,23 @@
 from django.shortcuts import render, get_object_or_404, redirect, Http404
-from .forms import AddMemberForm, AddStaffForm, LoginForm, AddUserForm
+from .forms import AddMemberForm, AddStaffForm, LoginForm, AddUserForm, AddRoomForm, AddTrainerForm
 from datetime import datetime
 from django.views import View
-from .models import Members, SEX, Staff, Trainings, TRAININGS, TYPES
+from .models import Members, SEX, Staff, Trainings, TRAININGS, TYPES, Rooms
 from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import TemplateView
 from django.contrib.auth.models import User
-
+from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 class GymView(View):
     def get(self, request):
         return render(request, "main_page.html")
 
 
-class ShowMembersView(View):
+class ShowMembersView(LoginRequiredMixin, View):
     def get(self, request):
         members = User.objects.all()
         return render(request, "members.html", {"members":members})
@@ -41,9 +42,13 @@ class ShowMembersDetailsView(View):
 #             return redirect(f'/member/{new_member.id}')
 #         return render(request, "member-add.html", {"form":form})
 
-class ShowTrainersView(View):
+class ShowTrainersView( View):
     def get(self, request):
         trainers = Staff.objects.filter(type=0)
+        trainings = Trainings.objects.all()
+        trainers_ids = [trainer.id for trainer in trainers]
+        trainings_names = [[TRAININGS[int(t)][1]] for t in trainers_ids]
+
         return render(request, "trainers.html", {"trainers":trainers})
 
 class AddStaffView(View):
@@ -58,8 +63,16 @@ class AddStaffView(View):
                                                last_name = form.cleaned_data["last_name"],
             year_of_birth = form.cleaned_data["year_of_birth"],
             type = form.cleaned_data["type"])
-            return redirect(f'/staff/{new_staff.id}')
+            return redirect(f'/staff_details/{new_staff.id}')
         return render(request, "staff-add.html", {"form":form})
+
+
+
+class ShowStaffDetailsView(View):
+    def get(self, request, id):
+        staff = Staff.objects.get(id=id)
+        training_type = (TRAININGS[int(staff.type)])[1]
+        return render(request, "staff-details.html", {"staff": staff, "training_type":training_type})
 
 class ShowTrainings(View):
     def get(self, request):
@@ -96,7 +109,7 @@ class Login(FormView):
 
 
 
-class Logout(View):
+class Logout(LoginRequiredMixin,View):
     def get(self, request):
         return render(request, "logout.html")
 
@@ -114,3 +127,37 @@ class AddUser(CreateView):
 class Reservation(View):
     def get(self, request):
         return render(request, "logout.html")
+
+class AddRoomView(View):
+    def get(self, request):
+        form = AddRoomForm()
+        return render(request, "room-add.html", {"form":form})
+
+    def post(self, request):
+        form = AddRoomForm(request.POST)
+        if form.is_valid():
+            new_room = Rooms.objects.create(name = form.cleaned_data["name"],
+                                            capacity = form.cleaned_data["capacity"],
+                                            training=form.cleaned_data["training"])
+            return redirect(f'/room/{new_room.id}')
+        return render(request, "room-add.html", {"form":form})
+
+class RoomsView(View):
+    def get(self, request):
+        rooms = Rooms.objects.all()
+        return render(request, "rooms.html", {"rooms":rooms})
+
+
+class AddTrainerView(View):
+    def get(self, request):
+        form = AddTrainerForm()
+        user = User.objects.all()
+        return render(request, "trainer-add.html", {"form":form, "user":user})
+
+    def post(self, request):
+        form = AddTrainerForm(request.POST)
+        if form.is_valid():
+            trainer = Trainers.objects.create(user = form.cleaned_data["user"],
+                                            training_type = form.cleaned_data["training_type"])
+            return redirect(f'/room/{new_room.id}')
+        return render(request, "room-add.html", {"form":form})

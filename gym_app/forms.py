@@ -1,5 +1,5 @@
 from django import forms
-from .models import SEX, Members, TYPES
+from .models import SEX, Members, TYPES, TRAININGS, User
 from django.db import models
 from django.core.validators import EmailValidator, URLValidator, ValidationError
 from django.contrib.auth.models import User
@@ -80,3 +80,12 @@ class AddUserForm(UserForm):
     class Meta(UserForm.Meta):
         fields = UserForm.Meta.fields + ('password_1', 'password_2')
 
+class AddRoomForm(forms.Form):
+    name = forms.CharField(label="Name", max_length = 64)
+    capacity = forms.IntegerField(label = "Capacity", min_value=1, max_value=18)
+    training = forms.ChoiceField(label = "Training type", choices = TRAININGS)
+
+
+class AddTrainerForm(forms.Form):
+    user = forms.CharField(label = "User",  choices = User.objects.all())
+    training_type = forms.ChoiceField(label = "Training type", choices=TRAININGS)

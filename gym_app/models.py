@@ -68,9 +68,13 @@ class Staff(models.Model):
     year_of_birth = models.IntegerField(null=True)
     type = models.CharField(max_length=64, choices = TYPES)
 
+class Trainers(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    training_type = models.IntegerField(choices=TRAININGS)
+
 class Trainings(models.Model):
     name = models.CharField(max_length=64, choices = TRAININGS)
-    trainer = models.OneToOneField(Staff, on_delete=models.CASCADE, primary_key=True)
+    trainer = models.ForeignKey(Trainers, on_delete=models.CASCADE, primary_key=True)
     start_time = models.IntegerField(choices = HOURS)
     end_time = models.IntegerField(choices = HOURS)
     date = models.DateField()
@@ -79,11 +83,12 @@ class Trainings(models.Model):
 class Rooms(models.Model):
     name = models.CharField(max_length=64)
     capacity = models.SmallIntegerField()
-    training = models.ManyToManyField(Trainings)
+    training = models.ForeignKey(Trainings, on_delete=models.CASCADE, default = True)
 
 
 class Reservations(models.Model):
     user = models.ForeignKey(User, on_delete = models.CASCADE)
     training = models.ForeignKey(Trainings, on_delete=models.CASCADE)
     msg_to_trainer = models.CharField(max_length=256, null = True)
+
 
