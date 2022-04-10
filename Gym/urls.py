@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from gym_app.views import   (ShowMembersView, ShowMembersDetailsView, ShowTrainersView, AddStaffView,
                             ShowStaffDetailsView, ShowTrainings, Login, Logout, AddUser, GymView, Reservation,
-                             AddRoomView, RoomsView, AddTrainerView
+                             AddRoomView, RoomsView, AddTrainerView, AddTrainingView
                             )
 
 urlpatterns = [
@@ -37,5 +37,6 @@ urlpatterns = [
     path('reservation/', Reservation.as_view(), name="reserve"),
     path('room_add/', AddRoomView.as_view(), name="room-add"),
     path('trainer_add/', AddTrainerView.as_view(), name="trainer-add"),
+    path('training_add/', AddTrainingView.as_view(), name="training-add"),
 
 ]

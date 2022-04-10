@@ -1,5 +1,5 @@
 from django import forms
-from .models import SEX, Members, TYPES, TRAININGS, User
+from .models import SEX, Members, TYPES, TRAININGS, User, Trainers, HOURS
 from django.db import models
 from django.core.validators import EmailValidator, URLValidator, ValidationError
 from django.contrib.auth.models import User
@@ -87,5 +87,14 @@ class AddRoomForm(forms.Form):
 
 
 class AddTrainerForm(forms.Form):
-    user = forms.CharField(label = "User",  choices = User.objects.all())
+    user = forms.ModelChoiceField(label = "User",  queryset = User.objects.all())
     training_type = forms.ChoiceField(label = "Training type", choices=TRAININGS)
+
+
+class AddTrainingForm(forms.Form):
+    name = forms.ChoiceField(label = "Training type", choices = TRAININGS)
+    trainer = forms.ModelChoiceField(label = "User",  queryset = Trainers.objects.all())
+    start_time = forms.ChoiceField(label = "Start time", choices = HOURS)
+    end_time = forms.ChoiceField(label = "End time", choices = HOURS)
+    date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    max_participants = forms.IntegerField(label ="Max participants", min_value = 1)

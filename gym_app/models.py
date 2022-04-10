@@ -20,7 +20,7 @@ TRAININGS = (
 )
 
 TYPES = (
-    (0, "Trainer"),
+    # (0, "Trainer"),
     (1, "Recepctionist"),
     (2, "Director"),
     (3, "Accountant"),
@@ -71,6 +71,9 @@ class Staff(models.Model):
 class Trainers(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     training_type = models.IntegerField(choices=TRAININGS)
+
+    def __str__(self):
+        return str(self.user)
 
 class Trainings(models.Model):
     name = models.CharField(max_length=64, choices = TRAININGS)

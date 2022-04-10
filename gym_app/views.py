@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect, Http404
-from .forms import AddMemberForm, AddStaffForm, LoginForm, AddUserForm, AddRoomForm, AddTrainerForm
+from .forms import AddMemberForm, AddStaffForm, LoginForm, AddUserForm, AddRoomForm, AddTrainerForm, AddTrainingForm
 from datetime import datetime
 from django.views import View
-from .models import Members, SEX, Staff, Trainings, TRAININGS, TYPES, Rooms
+from .models import Members, SEX, Staff, Trainings, TRAININGS, TYPES, Rooms, Trainers
 from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect
@@ -25,7 +25,15 @@ class ShowMembersView(LoginRequiredMixin, View):
 class ShowMembersDetailsView(View):
     def get(self, request, user_id):
         user = User.objects.get(id = user_id)
-        return render(request, "user-details.html", {"user":user})
+        training_types = TRAININGS
+        return render(request, "user-details.html", {"user":user, "training_types":training_types})
+
+    def post(self,request,user_id):
+        user = User.objects.get(id=user_id)
+
+        t_type = request.POST.get("t_type")
+        trainer = Trainers.objects.create(user_id=user_id, training_type=t_type)
+        return HttpResponse("trainer added")
 
 # class AddMemberView(View):
 #     def get(self, request):
@@ -159,5 +167,30 @@ class AddTrainerView(View):
         if form.is_valid():
             trainer = Trainers.objects.create(user = form.cleaned_data["user"],
                                             training_type = form.cleaned_data["training_type"])
-            return redirect(f'/room/{new_room.id}')
-        return render(request, "room-add.html", {"form":form})
+            return HttpResponse("Trainer has been added")
+        return render(request, "main_page.html")
+
+
+class AddTrainingView(View):
+    def get(self, request):
+        form = AddTrainingForm()
+        return render(request, "training-add.html", {"form":form})
+
+    def post(self, request):
+        form = AddTrainingForm(request.POST)
+        # today = datetime.today().strftime("%Y-%m-%d")
+        today = datetime.today()
+        if form.is_valid():
+            if form.cleaned_data["start_time"] < form.cleaned_data["end_time"]:
+                training = Trainings.objects.create(name = form.cleaned_data["name"],
+                                                trainer = form.cleaned_data["trainer"],
+                                                start_time=form.cleaned_data["start_time"],
+                                                end_time=form.cleaned_data["end_time"],
+                                                date=form.cleaned_data["date"],
+                                                max_participants=form.cleaned_data["max_participants"])
+                return HttpResponse("Training has been added")
+            return render(request,"training-add.html", {"form":form, "error":"End time before start time"})
+        return render(request, "main_page.html")
+
+
+

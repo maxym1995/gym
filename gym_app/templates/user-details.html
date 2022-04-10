@@ -6,6 +6,18 @@
     <ul>
         <l1>Email: {{user.email}}</l1> <br>
         <l1>Date joined: {{ user.date_joined }}</l1> <br>
+
+        <form action="" method ="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        {% for type in training_types %}
+            <option value="{{type}}"
+                    {% if type == current_type %} selected ="selected"{% endif %}
+                    {{type|capfirst}}
+                    </option>
+            {% endfor %}
+        <button type="submit"> Mark as trainer</button>
+    </form>
     </ul>
 
 
