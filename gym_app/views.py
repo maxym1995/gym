@@ -92,7 +92,19 @@ class ShowTrainings(View):
         trainings = Trainings.objects.all()
         traning_list = zip([(str(TRAININGS[int(t.name)][1]))for t in trainings ], [(str(HOURS[int(st.start_time)][1])) for st in trainings],
                            [(str(HOURS[int(et.end_time)][1])) for et in trainings],trainings)
+        return render(request, "trainings.html", {"traning_list":traning_list})
 
+
+class ShowTrainingDetailsView(View):
+    def get(self, request, id):
+        training = Trainings.objects.get(id=id)
+        return render(request, "training-details.html", {"training":training})
+
+class ShowTrainings(View):
+    def get(self, request):
+        trainings = Trainings.objects.all()
+        traning_list = zip([(str(TRAININGS[int(t.name)][1]))for t in trainings ], [(str(HOURS[int(st.start_time)][1])) for st in trainings],
+                           [(str(HOURS[int(et.end_time)][1])) for et in trainings],trainings)
         return render(request, "trainings.html", {"traning_list":traning_list})
 
 
