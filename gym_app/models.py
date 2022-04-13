@@ -76,8 +76,9 @@ class Trainers(models.Model):
         return str(self.user)
 
 class Trainings(models.Model):
+    id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=64, choices = TRAININGS)
-    trainer = models.ForeignKey(Trainers, on_delete=models.CASCADE, primary_key=True)
+    trainer = models.ForeignKey(Trainers, on_delete=models.CASCADE)
     start_time = models.IntegerField(choices = HOURS)
     end_time = models.IntegerField(choices = HOURS)
     date = models.DateField()
