@@ -1,13 +1,49 @@
 
 {% extends "base.html" %}
 {% block content %}
-    <h2>
-        Trainings list in our club:
-    </h2>
-    <ul>
-        {% for a,b in zipped %}
-        <li>{{ b }}   Trainer: {{ a.trainer.first_name }} {{ a.trainer.last_name }}      </l1> <br>
 
-        {% endfor %}
-    </ul>
+  {% for tn in t_names  %}
+{{t}}
+
+{% endfor %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trainings list</title>
+    <style>
+        table   {border: 1px solid black}
+        td      {border: 1px solid black}
+        tr      {border: 2px solid black}
+    </style>
+</head>
+<body>
+<h2>Trainings list: </h2>
+<br>
+<table>
+    <tr>
+    <td> <b> Training
+    <td> <b> Trainer
+    <td> <b> Date
+    <td> <b> Hours
+    <td> <b> Reserve
+
+    <tr/>
+
+  {% for tn, st, et, t in traning_list  %}
+
+      <tr>
+          <td>{{ tn }}</td>
+          <td>{{ t.trainer }}</td>
+          <td>{{ t.date }}</td>
+          <td>{{ st }}-{{ et}}</td>
+          <td> Reserve</td>
+      </tr>
+
+    {% endfor %}
+
+</table>
+</body>
+</html>
+
 {% endblock %}

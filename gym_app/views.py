@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect, Http404
-from .forms import AddMemberForm, AddStaffForm, LoginForm, AddUserForm, AddRoomForm, AddTrainerForm, AddTrainingForm
+from .forms import AddMemberForm, AddStaffForm, LoginForm, AddUserForm, AddRoomForm, AddTrainerForm, AddTrainingForm, ReservationForm
 from datetime import datetime
 from django.views import View
-from .models import Members, SEX, Staff, Trainings, TRAININGS, TYPES, Rooms, Trainers
+from .models import Members, SEX, Staff, Trainings, TRAININGS, TYPES, Rooms, Trainers, Reservations, HOURS
 from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect
@@ -20,6 +20,11 @@ class GymView(View):
 class ShowMembersView(LoginRequiredMixin, View):
     def get(self, request):
         members = User.objects.all()
+        return render(request, "members.html", {"members":members})
+
+class ShowStaffView(LoginRequiredMixin, View):
+    def get(self, request):
+        staff = Staff.objects.all()
         return render(request, "members.html", {"members":members})
 
 class ShowMembersDetailsView(View):
@@ -85,21 +90,10 @@ class ShowStaffDetailsView(View):
 class ShowTrainings(View):
     def get(self, request):
         trainings = Trainings.objects.all()
-        trainings_names = []
-        for t in trainings:
-            trainings_names.append(t.name)
-        intigers = []
-        for i in trainings_names:
-            intigers.append(int(i))
-        names = []
-        for j in intigers:
-            names.append(TRAININGS[j])
-        names_list = []
-        for n in names:
-            names_list.append(n[1])
+        traning_list = zip([(str(TRAININGS[int(t.name)][1]))for t in trainings ], [(str(HOURS[int(st.start_time)][1])) for st in trainings],
+                           [(str(HOURS[int(et.end_time)][1])) for et in trainings],trainings)
 
-        zipped_list = zip(trainings, names_list)
-        return render(request, "trainings.html", {"zipped":zipped_list})
+        return render(request, "trainings.html", {"traning_list":traning_list})
 
 
 class Login(FormView):
@@ -180,8 +174,15 @@ class AddTrainingView(View):
         form = AddTrainingForm(request.POST)
         # today = datetime.today().strftime("%Y-%m-%d")
         today = datetime.today()
+        trainers = Trainings.objects.all()
+        t_list = [t.trainer.name for t in trainers]
+
         if form.is_valid():
-            if form.cleaned_data["start_time"] < form.cleaned_data["end_time"]:
+            if form.cleaned_data["start_time"] > form.cleaned_data["end_time"]:
+                return render(request, "training-add.html", {"form":form, "error":"End time before start time"})
+            # if form.cleaned_data["trainer"] in t_list:
+            #     return render(request, "training-add.html", {"form":form, "error":"This trainer is already assigned to training."})
+            else:
                 training = Trainings.objects.create(name = form.cleaned_data["name"],
                                                 trainer = form.cleaned_data["trainer"],
                                                 start_time=form.cleaned_data["start_time"],
@@ -189,8 +190,22 @@ class AddTrainingView(View):
                                                 date=form.cleaned_data["date"],
                                                 max_participants=form.cleaned_data["max_participants"])
                 return HttpResponse("Training has been added")
-            return render(request,"training-add.html", {"form":form, "error":"End time before start time"})
+            # return render(request,"training-add.html", {"form":form, "error":"End time before start time"})
         return render(request, "main_page.html")
 
+
+class ReservationView(LoginRequiredMixin, View):
+    def get(self, request):
+        form = ReservationForm()
+        return render(request, "reserve.html", {"form":form})
+
+    def post(self, request):
+        form = ReservationForm(request.POST)
+        if form.is_valid():
+                reservation = Reservations.objects.create(user = form.cleaned_data["user"],
+                                                training = form.cleaned_data["training"],
+                                                msg_to_trainer= form.cleaned_data["msg_to_trainer"])
+                return HttpResponse("Reservation has been added")
+        return render(request, "main_page.html")
 
 

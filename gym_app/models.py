@@ -83,6 +83,10 @@ class Trainings(models.Model):
     date = models.DateField()
     max_participants = models.PositiveIntegerField()
 
+    def __str__(self):
+        return f'{str(TRAININGS[int(self.name)][1])}, trainer: {self.trainer} date: {self.date}, ' \
+               f'duration:{str(HOURS[int(self.start_time)][1])}-{str(HOURS[int(self.end_time)][1])}'
+
 class Rooms(models.Model):
     name = models.CharField(max_length=64)
     capacity = models.SmallIntegerField()
