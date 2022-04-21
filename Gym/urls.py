@@ -18,13 +18,14 @@ from django.urls import path
 from gym_app.views import   (ShowMembersView, ShowTrainersView, AddStaffView,
                             ShowStaffDetailsView, ShowTrainings, Login, Logout, AddUser, GymView,
                             AddRoomView, RoomsView, AddTrainerView, AddTrainingView, ReservationView, ShowTrainingDetailsView,
-                            UserReservationsView, ShowStaffView
+                            UserReservationsView, ShowStaffView, ShowRoomDetailsView, UserReservationDeleteView
                             )
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", GymView.as_view(), name = "main"),
     path("rooms/", RoomsView.as_view(), name = "rooms"),
+    path("room_details/<int:id>/", ShowRoomDetailsView.as_view(), name="room-details"),
     path("trainers/", ShowTrainersView.as_view(), name = "trainers"),
     path("staff_add/", AddStaffView.as_view(), name = "staff-add"),
     path("staff_details/<int:id>/", ShowStaffDetailsView.as_view(), name = "staff-details"),
@@ -37,6 +38,7 @@ urlpatterns = [
     path('training_add/', AddTrainingView.as_view(), name="training-add"),
     path('reserve/', ReservationView.as_view(), name="reserve"),
     path("training_details/<int:id>/", ShowTrainingDetailsView.as_view(), name = "training-details"),
+    path("reservation_delete/<int:id>/", UserReservationDeleteView.as_view(), name = "reservation-delete"),
     path("reservation_details/", UserReservationsView.as_view(), name = "reservation-details"),
     path("staff/", ShowStaffView.as_view(), name = "staff"),
     path("members/", ShowMembersView.as_view(), name = "members"),

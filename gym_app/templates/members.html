@@ -1,13 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
-    <h2>
-        Our club members :
-    </h2>
-    <ul>
-        {% for member in members %}
-        <l1> {{member}}  </l1> <br>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Trainings list</title>
+    <style>
+        table   {border: 1px solid black}
+        td      {border: 1px solid black}
+        tr      {border: 2px solid black}
+    </style>
+</head>
+<body>
+<h2>Members list: </h2>
+<br>
+<table>
+    <tr>
+    <td> <b> Username
+    <td> <b> First name
+    <td> <b> Last name
+    <td> <b> Email
+    <td> <b> Active
+
+    <tr/>
+
+  {% for member in members  %}
+
+      <tr>
+          <td>{{ member.username }}</td>
+          <td>{{ member.first_name }}</td>
+          <td>{{ member.last_name }}</td>
+          <td>{{ member.email }}</td>
+          <td>{{ member.is_active }}</td>
+      </tr>
 
 
-        {% endfor %}
-    </ul>
+    {% endfor %}
+
+</table>
+</body>
+</html>
+
 {% endblock %}

@@ -19,29 +19,23 @@
     <td> <b> Training
     <td> <b> Date
     <td> <b> Message to trainer
+    <td> <b> Resign
 
 
     <tr/>
 
-  {% for reservation in reservations %}
+  {% for reservation, date, name in zipped %}
 
       <tr>
-          <td>{{reservation.training_id}}</td>
-          <td> data </td>
+          <td>{{name}}</td>
+          <td> {{date}} </td>
           <td>{{reservation.msg_to_trainer}}</td>
+          <td> <a href="/reservation_delete/{{reservation.id}}">Cancel reservation</a></td>
 
       </tr>
 
     {% endfor %}
 
-
-    {% for t in trainings %}
-    {{t}}
-    {% endfor %}
-
-        {% for t in trainings_dates %}
-    {{t}}
-    {% endfor %}
 </table>
 </body>
 </html>

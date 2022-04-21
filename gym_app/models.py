@@ -94,6 +94,9 @@ class Rooms(models.Model):
     capacity = models.SmallIntegerField()
     training = models.ForeignKey(Trainings, on_delete=models.CASCADE, default = True)
 
+    def __str__(self):
+        return f'''Room name: {self.name}  capacity: {self.capacity}  training: {self.training}'''
+
 
 class Reservations(models.Model):
     user = models.ForeignKey(User, on_delete = models.CASCADE)

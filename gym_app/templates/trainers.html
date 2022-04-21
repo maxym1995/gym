@@ -1,11 +1,37 @@
 {% extends "base.html" %}
 {% block content %}
-    <h2>
-        Our club trainers :
-    </h2>
-    <ul>
-        {% for trainer in trainers %}
-        <l1> {{trainer}} </l1> <br>
-        {% endfor %}
-    </ul>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trainings list</title>
+    <style>
+        table   {border: 1px solid black}
+        td      {border: 1px solid black}
+        tr      {border: 2px solid black}
+    </style>
+</head>
+<body>
+<h2> Our club trainers: </h2>
+<br>
+<table>
+    <tr>
+    <td> <b> Trainer
+    <td> <b> Training
+
+    <tr/>
+
+{% for trainer, t_names in zipped %}
+
+      <tr>
+          <td>{{trainer}}</td>
+          <td> {{t_names}} </td>
+
+      </tr>
+
+    {% endfor %}
+
+</table>
+</body>
+</html>
+
 {% endblock %}

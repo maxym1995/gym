@@ -1,13 +1,41 @@
 {% extends "base.html" %}
 {% block content %}
-    <h2>
-        Rooms :
-    </h2>
-    <ul>
-        {% for room in rooms %}
-        <l1> color: {{room.name}}, capacity: {{room.capacity}}, training type: {{room.training}}
 
-        </l1> <br>
-        {% endfor %}
-    </ul>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trainings list</title>
+    <style>
+        table   {border: 1px solid black}
+        td      {border: 1px solid black}
+        tr      {border: 2px solid black}
+    </style>
+</head>
+<body>
+<h2>Rooms list: </h2>
+<br>
+<table>
+    <tr>
+    <td> <b> Color
+    <td> <b> Capacity
+    <td> <b> Check details
+
+
+    <tr/>
+
+  {% for room in rooms  %}
+
+      <tr>
+          <td>{{ room.name }}</td>
+          <td>{{ room.capacity }}</td>
+          <td> <a href="/room_details/{{ room.id}}">Room details</a></td>
+
+      </tr>
+
+    {% endfor %}
+
+</table>
+</body>
+</html>
+
 {% endblock %}

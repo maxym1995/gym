@@ -1,11 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
-    <h2>
-        Our club Staff :
-    </h2>
-    <ul>
-        {% for s in staff %}
-        <l1> {{s}} </l1> <br>
-        {% endfor %}
-    </ul>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trainings list</title>
+    <style>
+        table   {border: 1px solid black}
+        td      {border: 1px solid black}
+        tr      {border: 2px solid black}
+    </style>
+</head>
+<body>
+<h2>Rooms list: </h2>
+<br>
+<table>
+    <tr>
+    <td> <b> Position
+    <td> <b> Experience (years)
+    <td> <b> Check
+
+
+    <tr/>
+
+  {% for s in staff  %}
+
+      <tr>
+          <td>{{ staff.type }}</td>
+          <td>{{ staff.years_of_experience }}</td>
+          <td> <a href="/staff_details/{{ staff.id}}">Check</a></td>
+
+      </tr>
+
+    {% endfor %}
+
+</table>
+</body>
+</html>
+
 {% endblock %}
