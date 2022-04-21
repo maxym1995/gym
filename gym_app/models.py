@@ -21,7 +21,7 @@ TRAININGS = (
 
 TYPES = (
     # (0, "Trainer"),
-    (1, "Recepctionist"),
+    (1, "Receptionist"),
     (2, "Director"),
     (3, "Accountant"),
 )
@@ -63,10 +63,12 @@ class Members(models.Model):
     year_of_birth = models.IntegerField(null=True)
 
 class Staff(models.Model):
-    first_name = models.CharField(max_length=64)
-    last_name = models.CharField(max_length=64)
-    year_of_birth = models.IntegerField(null=True)
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
     type = models.CharField(max_length=64, choices = TYPES)
+    years_of_experience = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f'Name:{str(self.user)}, position: {str(TYPES[int(self.type)][1])} , experience: {self.years_of_experience} years'
 
 class Trainers(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -76,7 +78,6 @@ class Trainers(models.Model):
         return str(self.user)
 
 class Trainings(models.Model):
-    id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=64, choices = TRAININGS)
     trainer = models.ForeignKey(Trainers, on_delete=models.CASCADE)
     start_time = models.IntegerField(choices = HOURS)
@@ -98,5 +99,3 @@ class Reservations(models.Model):
     user = models.ForeignKey(User, on_delete = models.CASCADE)
     training = models.ForeignKey(Trainings, on_delete=models.CASCADE)
     msg_to_trainer = models.CharField(max_length=256, null = True)
-
-

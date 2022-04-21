@@ -14,10 +14,9 @@ class AddMemberForm(forms.Form):
 
 
 class AddStaffForm(forms.Form):
-    first_name = forms.CharField(label="Name", max_length = 64)
-    last_name = forms.CharField(label="Surname", max_length= 64)
-    year_of_birth = forms.IntegerField(label = "Year of birth", min_value=1900, max_value=2022)
+    user = forms.ModelChoiceField(label = "User", queryset = User.objects.all())
     type = forms.ChoiceField(label = "Training type", choices = TYPES)
+    years_of_experience = forms.IntegerField(min_value = 0, label = "Years of experience")
 
 
 class LoginForm(forms.Form):
@@ -100,6 +99,6 @@ class AddTrainingForm(forms.Form):
     max_participants = forms.IntegerField(label ="Max participants", min_value = 1)
 
 class ReservationForm(forms.Form):
-    user = forms.ModelChoiceField(label = "User",  queryset = User.objects.all())
+    # user = forms.ModelChoiceField(label = "User",  queryset = User.objects.all())
     training = forms.ModelChoiceField(label = "Select training", queryset = Trainings.objects.all().order_by("date", "start_time"))
     msg_to_trainer = forms.CharField(label="Message to trainer", max_length = 200)

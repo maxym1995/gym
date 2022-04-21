@@ -10,35 +10,51 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import TemplateView
 from django.contrib.auth.models import User
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
+'''Display main page of application'''
 class GymView(View):
     def get(self, request):
         return render(request, "main_page.html")
 
-
-class ShowMembersView(LoginRequiredMixin, View):
+'''Display gym's members'''
+class ShowMembersView(LoginRequiredMixin,PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = 'gym_app.view_user'
     def get(self, request):
-        members = User.objects.all()
+        users = User.objects.all()
+        trainers = Trainers.objects.all()
+        users_id = [u.id for u in users]
+        trainers_id = [t.user_id for t in trainers]
+        members_id = []
+        for u in users_id:
+            if u not in trainers_id:
+                members_id.append(u)
+        members = []
+        for m_id in members_id:
+            user = User.objects.get(id=m_id)
+            members.append(user)
         return render(request, "members.html", {"members":members})
 
+'''Display gym's staff'''
 class ShowStaffView(LoginRequiredMixin, View):
+    login_url = '/login/'
     def get(self, request):
         staff = Staff.objects.all()
-        return render(request, "members.html", {"members":members})
+        return render(request, "staff.html", {"staff":staff})
 
-class ShowMembersDetailsView(View):
-    def get(self, request, user_id):
-        user = User.objects.get(id = user_id)
-        training_types = TRAININGS
-        return render(request, "user-details.html", {"user":user, "training_types":training_types})
 
-    def post(self,request,user_id):
-        user = User.objects.get(id=user_id)
+# class ShowMembersDetailsView(View):
+#     def get(self, request, user_id):
+#         user = User.objects.get(id = user_id)
+#         training_types = TRAININGS
+#         return render(request, "user-details.html", {"user":user, "training_types":training_types})
 
-        t_type = request.POST.get("t_type")
-        trainer = Trainers.objects.create(user_id=user_id, training_type=t_type)
-        return HttpResponse("trainer added")
+    # def post(self,request,user_id):
+    #     user = User.objects.get(id=user_id)
+    #     t_type = request.POST.get("t_type")
+    #     trainer = Trainers.objects.create(user_id=user_id, training_type=t_type)
+    #     return HttpResponse("trainer added")
 
 # class AddMemberView(View):
 #     def get(self, request):
@@ -55,16 +71,15 @@ class ShowMembersDetailsView(View):
 #             return redirect(f'/member/{new_member.id}')
 #         return render(request, "member-add.html", {"form":form})
 
+'''Display gym's trainers'''
 class ShowTrainersView( View):
     def get(self, request):
-        trainers = Staff.objects.filter(type=0)
-        trainings = Trainings.objects.all()
-        trainers_ids = [trainer.id for trainer in trainers]
-        trainings_names = [[TRAININGS[int(t)][1]] for t in trainers_ids]
-
+        trainers = Trainers.objects.all()
         return render(request, "trainers.html", {"trainers":trainers})
 
-class AddStaffView(View):
+'''Add new staff'''
+class AddStaffView(LoginRequiredMixin, View):
+    login_url = '/login/'
     def get(self, request):
         form = AddStaffForm()
         return render(request, "staff-add.html", {"form":form})
@@ -72,34 +87,28 @@ class AddStaffView(View):
     def post(self, request):
         form = AddStaffForm(request.POST)
         if form.is_valid():
-            new_staff = Staff.objects.create(first_name = form.cleaned_data["first_name"],
-                                               last_name = form.cleaned_data["last_name"],
-            year_of_birth = form.cleaned_data["year_of_birth"],
-            type = form.cleaned_data["type"])
+            new_staff = Staff.objects.create(user = form.cleaned_data["user"],
+                                               type = form.cleaned_data["type"],
+            years_of_experience = form.cleaned_data["years_of_experience"])
             return redirect(f'/staff_details/{new_staff.id}')
         return render(request, "staff-add.html", {"form":form})
 
 
-
-class ShowStaffDetailsView(View):
+'''Display staff details '''
+class ShowStaffDetailsView(LoginRequiredMixin, View):
+    login_url = '/login/'
     def get(self, request, id):
         staff = Staff.objects.get(id=id)
-        training_type = (TRAININGS[int(staff.type)])[1]
-        return render(request, "staff-details.html", {"staff": staff, "training_type":training_type})
-
-class ShowTrainings(View):
-    def get(self, request):
-        trainings = Trainings.objects.all()
-        traning_list = zip([(str(TRAININGS[int(t.name)][1]))for t in trainings ], [(str(HOURS[int(st.start_time)][1])) for st in trainings],
-                           [(str(HOURS[int(et.end_time)][1])) for et in trainings],trainings)
-        return render(request, "trainings.html", {"traning_list":traning_list})
+        return render(request, "staff-details.html", {"staff": staff})
 
 
+'''Display training details '''
 class ShowTrainingDetailsView(View):
     def get(self, request, id):
         training = Trainings.objects.get(id=id)
         return render(request, "training-details.html", {"training":training})
 
+'''Display avaliable trainings '''
 class ShowTrainings(View):
     def get(self, request):
         trainings = Trainings.objects.all()
@@ -107,7 +116,7 @@ class ShowTrainings(View):
                            [(str(HOURS[int(et.end_time)][1])) for et in trainings],trainings)
         return render(request, "trainings.html", {"traning_list":traning_list})
 
-
+'''User login '''
 class Login(FormView):
     form_class = LoginForm
     template_name = "login_form.html"
@@ -122,8 +131,9 @@ class Login(FormView):
         return redirect(reverse('main'))
 
 
-
+'''User logout '''
 class Logout(LoginRequiredMixin,View):
+    login_url = '/login/'
     def get(self, request):
         return render(request, "logout.html")
 
@@ -131,18 +141,15 @@ class Logout(LoginRequiredMixin,View):
         logout(request)
         return redirect(reverse('main'))
 
-
+'''Register User (add user) '''
 class AddUser(CreateView):
     form_class = AddUserForm
     template_name = "user_add.html"
     success_url = reverse_lazy('main')
 
-
-class Reservation(View):
-    def get(self, request):
-        return render(request, "logout.html")
-
-class AddRoomView(View):
+'''Add new room '''
+class AddRoomView(LoginRequiredMixin, View):
+    login_url = '/login/'
     def get(self, request):
         form = AddRoomForm()
         return render(request, "room-add.html", {"form":form})
@@ -156,13 +163,15 @@ class AddRoomView(View):
             return redirect(f'/room/{new_room.id}')
         return render(request, "room-add.html", {"form":form})
 
+'''Display all rooms '''
 class RoomsView(View):
     def get(self, request):
         rooms = Rooms.objects.all()
         return render(request, "rooms.html", {"rooms":rooms})
 
-
-class AddTrainerView(View):
+'''Add trainer '''
+class AddTrainerView(LoginRequiredMixin, View):
+    login_url = '/login/'
     def get(self, request):
         form = AddTrainerForm()
         user = User.objects.all()
@@ -173,11 +182,12 @@ class AddTrainerView(View):
         if form.is_valid():
             trainer = Trainers.objects.create(user = form.cleaned_data["user"],
                                             training_type = form.cleaned_data["training_type"])
-            return HttpResponse("Trainer has been added")
+            return HttpResponse('''Trainer has been added <br> <a href=''> Back</a> ''')
         return render(request, "main_page.html")
 
-
-class AddTrainingView(View):
+'''Add training '''
+class AddTrainingView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
     def get(self, request):
         form = AddTrainingForm()
         return render(request, "training-add.html", {"form":form})
@@ -187,7 +197,7 @@ class AddTrainingView(View):
         # today = datetime.today().strftime("%Y-%m-%d")
         today = datetime.today()
         trainers = Trainings.objects.all()
-        t_list = [t.trainer.name for t in trainers]
+        # t_list = [t.trainer.name for t in trainers]
 
         if form.is_valid():
             if form.cleaned_data["start_time"] > form.cleaned_data["end_time"]:
@@ -201,23 +211,44 @@ class AddTrainingView(View):
                                                 end_time=form.cleaned_data["end_time"],
                                                 date=form.cleaned_data["date"],
                                                 max_participants=form.cleaned_data["max_participants"])
-                return HttpResponse("Training has been added")
+                return HttpResponse('''Training has been added <br> <a href='/trainings'> Back</a> ''')
             # return render(request,"training-add.html", {"form":form, "error":"End time before start time"})
         return render(request, "main_page.html")
 
 
-class ReservationView(LoginRequiredMixin, View):
+'''Make reservation '''
+class ReservationView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = ('gym_app.add_reservations', 'gym_app.change_reservations', 'gym_app.delete_reservations',
+                           'gym_app.view_reservations')
     def get(self, request):
         form = ReservationForm()
+
         return render(request, "reserve.html", {"form":form})
 
     def post(self, request):
         form = ReservationForm(request.POST)
         if form.is_valid():
-                reservation = Reservations.objects.create(user = form.cleaned_data["user"],
+                reservation = Reservations.objects.create(user = request.user,
                                                 training = form.cleaned_data["training"],
                                                 msg_to_trainer= form.cleaned_data["msg_to_trainer"])
-                return HttpResponse("Reservation has been added")
+                return HttpResponse('''Reservation has been added <br> <a href='/reserve'> Back</a> ''')
         return render(request, "main_page.html")
 
+'''Display all reservations for currently logged user '''
+class UserReservationsView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    def get(self, request):
+        if request.user.is_authenticated:
+            reservations = Reservations.objects.filter(user_id = request.user.id)
+            # trainings_id = [r.training_id for r in reservations]
+            # trainings = Trainings.objects.all()
+            # trainings_dates = [t.date for t in trainings_id]
+
+            # return render(request, "reservation-details.html", {"reservations": reservations, "trainings":trainings_id, "trainings_dates":trainings_dates})
+            return render(request, "reservation-details.html", {"reservations": reservations} )
+        else:
+            return HttpResponse('''Login error <br> <a href=''> Back</a> ''')
+        return redirect(reverse('main'))
+    ## this doesnt work when not logged, why ?
 
