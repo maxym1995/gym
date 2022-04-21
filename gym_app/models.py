@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 SEX = (
     (0, "Female"),
     (1, "Male"),
-
 )
 
 TRAININGS = (
@@ -50,7 +49,7 @@ HOURS = (
     (21, "21:00"),
     (22, "22:00"),
     (23, "23:00"),
-    (24, "24:00")
+    (24, "24:00"),
 )
 
 
@@ -62,13 +61,15 @@ class Members(models.Model):
     sex = models.IntegerField(choices=SEX)
     year_of_birth = models.IntegerField(null=True)
 
+
 class Staff(models.Model):
-    user = models.ForeignKey(User, on_delete = models.CASCADE)
-    type = models.CharField(max_length=64, choices = TYPES)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    type = models.CharField(max_length=64, choices=TYPES)
     years_of_experience = models.PositiveIntegerField()
 
     def __str__(self):
-        return f'Name:{str(self.user)}, position: {str(TYPES[int(self.type)][1])} , experience: {self.years_of_experience} years'
+        return f"Name:{str(self.user)}, position: {str(TYPES[int(self.type)][1])} , experience: {self.years_of_experience} years"
+
 
 class Trainers(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -77,28 +78,32 @@ class Trainers(models.Model):
     def __str__(self):
         return str(self.user)
 
+
 class Trainings(models.Model):
-    name = models.CharField(max_length=64, choices = TRAININGS)
+    name = models.CharField(max_length=64, choices=TRAININGS)
     trainer = models.ForeignKey(Trainers, on_delete=models.CASCADE)
-    start_time = models.IntegerField(choices = HOURS)
-    end_time = models.IntegerField(choices = HOURS)
+    start_time = models.IntegerField(choices=HOURS)
+    end_time = models.IntegerField(choices=HOURS)
     date = models.DateField()
     max_participants = models.PositiveIntegerField()
 
     def __str__(self):
-        return f'{str(TRAININGS[int(self.name)][1])}, trainer: {self.trainer} date: {self.date}, ' \
-               f'duration:{str(HOURS[int(self.start_time)][1])}-{str(HOURS[int(self.end_time)][1])}'
+        return (
+            f"{str(TRAININGS[int(self.name)][1])}, trainer: {self.trainer} date: {self.date}, "
+            f"duration:{str(HOURS[int(self.start_time)][1])}-{str(HOURS[int(self.end_time)][1])}"
+        )
+
 
 class Rooms(models.Model):
     name = models.CharField(max_length=64)
     capacity = models.SmallIntegerField()
-    training = models.ForeignKey(Trainings, on_delete=models.CASCADE, default = True)
+    training = models.ForeignKey(Trainings, on_delete=models.CASCADE, default=True)
 
     def __str__(self):
-        return f'''Room name: {self.name}  capacity: {self.capacity}  training: {self.training}'''
+        return f"""Room name: {self.name}  capacity: {self.capacity}  training: {self.training}"""
 
 
 class Reservations(models.Model):
-    user = models.ForeignKey(User, on_delete = models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     training = models.ForeignKey(Trainings, on_delete=models.CASCADE)
-    msg_to_trainer = models.CharField(max_length=256, null = True)
+    msg_to_trainer = models.CharField(max_length=256, null=True)
