@@ -35,7 +35,7 @@ def test_add_user():
 
 
 @pytest.mark.django_db
-def test_add_breeding():
+def test_add_v2():
     u = User.objects.create_user(username="Tosia", password="Tosia123!")
     c = Client()
     c.login(username="Tosia", password="Tosia123!")
